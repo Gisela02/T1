@@ -128,12 +128,46 @@ Resposta: Al variar la freqüència a 4kHz, el so es torna més agut que en el c
 2. Modifica el programa per considerar com a senyal a analitzar el senyal del fitxer wav que has creat 
     (`x_r, fm = sf.read('nom_fitxer.wav')`).
 
-    - Insereix a continuació una gràfica que mostri 5 períodes del senyal i la seva transformada.
+```python
+from numpy.fft import fft 
+import sounddevice as sd 
 
-    - Explica el resultat del apartat anterior.
+x_r, fm = sf.read('exercici1.wav')
+Tx=1/fx                                   
+Ls=int(fm*5*Tx)                           
+
+plt.figure(0)                             
+plt.plot(t[0:Ls], x[0:Ls])               
+plt.xlabel('t en segons')                 
+plt.title('5 periodes de la sinusoide')   
+plt.show() 
+sd.play(x, fm) 
+
+N=5000                        
+X=fft(x[0 : Ls], N)  
+
+k=np.arange(N)
+plt.figure(1)
+plt.plot(k,X)
+plt.xlabel('t en segons')                 
+plt.title('5 periodes de la sinusoide')   
+plt.show() 
+```
+
+- Insereix a continuació una gràfica que mostri 5 períodes del senyal i la seva transformada.
+
+<img src="img/figure1.jpg" width="400" align="center">
+<img src="img/figure2.jpg" width="400" align="center">
+
+- Explica el resultat del apartat anterior.
+
+Com que la senyal d'entrada és una sinusoide, si fem la transformada d'aquesta senyal, obtindrem una sinc que és el que observem en la gràfica anterior. 
 
 3. Modifica el programa per representar el mòdul de la Transformada de Fourier en dB i l'eix d'abscisses en el marge de
     $0$ a $f_m/2$ en Hz.
+```python
+import math as ma
+```
 
     - Comprova que la mesura de freqüència es correspon amb la freqüència de la sinusoide que has fet servir.
 
