@@ -165,13 +165,25 @@ Com que la senyal d'entrada és una sinusoide, si fem la transformada d'aquesta 
 
 3. Modifica el programa per representar el mòdul de la Transformada de Fourier en dB i l'eix d'abscisses en el marge de
     $0$ a $f_m/2$ en Hz.
+
 ```python
 import math as ma
+
+plt.figure(2)                        
+plt.subplot(211)  
+XdB = 20*ma.log(abs(X)/max(abs(X)))
+plt.plot(k,XdB)                   
+plt.title('Transformada del senyal de Ls={Ls} mostres amb DFT de N={N}')   
+plt.ylabel('|X[k]|')                 
+plt.subplot(212)                      
+plt.plot(k,np.unwrap(np.angle(XdB)))    
+plt.xlabel('Index k')                  
+plt.ylabel('$\phi_x[k]$')             
+plt.show()  
 ```
+- Comprova que la mesura de freqüència es correspon amb la freqüència de la sinusoide que has fet servir.
 
-    - Comprova que la mesura de freqüència es correspon amb la freqüència de la sinusoide que has fet servir.
-
-    - Com pots identificar l'amplitud de la sinusoide a partir de la representació de la transformada?
+- Com pots identificar l'amplitud de la sinusoide a partir de la representació de la transformada?
       Comprova-ho amb el senyal generat.
 
 > NOTES:
