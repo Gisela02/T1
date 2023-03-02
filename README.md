@@ -111,6 +111,8 @@ Proves i exercicis a fer i entregar
 import numpy as np
 import matplotlib.pyplot as plt
 import soundfile as sf
+import sounddevice as sd 
+from numpy.fft import fft 
 
 T= 2.5                              
 fm=8000                              
@@ -121,18 +123,9 @@ L = int(fm * T)
 Tm=1/fm                              
 t=Tm*np.arange(L)                   
 x = A * np.cos(2 * pi * fx * t)      
-sf.write('exercici1.wav', x, fm)   
-```
-Resposta: Al variar la freqüència a 4kHz, el so es torna més agut que en el cas anterior amb una freqüència a 440Hz.
-
-2. Modifica el programa per considerar com a senyal a analitzar el senyal del fitxer wav que has creat 
-    (`x_r, fm = sf.read('nom_fitxer.wav')`).
-
-```python
-from numpy.fft import fft 
-import sounddevice as sd 
-
+sf.write('exercici1.wav', x, fm)  
 x_r, fm = sf.read('exercici1.wav')
+
 Tx=1/fx                                   
 Ls=int(fm*5*Tx)                           
 
@@ -141,6 +134,7 @@ plt.plot(t[0:Ls], x[0:Ls])
 plt.xlabel('t en segons')                 
 plt.title('5 periodes de la sinusoide')   
 plt.show() 
+
 sd.play(x, fm) 
 
 N=5000                        
@@ -148,9 +142,103 @@ X=fft(x[0 : Ls], N)
 
 k=np.arange(N)
 plt.figure(1)
-plt.plot(k,X)
+plt.subplot(211)
+plt.plot(k,abs(X))
+plt.title('Transformada del senyal de Ls={Ls} mostres amb DFT de N={N}')   
+plt.ylabel('|X[k]|') 
+plt.subplot(212)
+plt.plot(k,np.unwrap(np.angle(X))) 
+plt.xlabel('Index k')                  
+plt.ylabel('$\phi_x[k]$')   
+plt.show() 
+
+
+sf.write('exercici2.wav', x, fm)  
+
+plt.figure(121)                             
+plt.plot(t[0:Ls], x[0:Ls])                
+plt.xlabel('t en segons')                
+plt.title('5 periodes de la sinusoide')   
+plt.show()  
+
+sd.play(x, fm)
+
+plt.figure(12)
+plt.subplot(211)
+plt.plot(k, abs(X)) 
+plt.title('Transformada del senyal de Ls={Ls} mostres amb DFT de N={N}')   
+plt.ylabel('|X[k]|') 
+plt.subplot(212)
+plt.plot(k,np.unwrap(np.angle(X))) 
+plt.xlabel('Index k')                  
+plt.ylabel('$\phi_x[k]$') 
+plt.show()
+
+XdB = 20*np.log10(np.abs(X)/max(np.abs(X)))
+fk = (k/N)*fm
+
+plt.figure(2)                        
+plt.subplot(211)
+ 
+plt.plot(fk,XdB)                   
+plt.title('Transformada del senyal de Ls={Ls} mostres amb DFT de N={N}')   
+plt.ylabel('|X[k]|')                 
+plt.subplot(212)                      
+plt.plot(k,np.unwrap(np.angle(XdB)))    
+plt.xlabel('Index k')                  
+plt.ylabel('$\phi_x[k]$')             
+plt.show()  
+```
+
+Resposta: Al variar la freqüència a 4kHz, el so es torna més agut que en el cas anterior amb una freqüència a 440Hz.
+
+2. Modifica el programa per considerar com a senyal a analitzar el senyal del fitxer wav que has creat 
+    (`x_r, fm = sf.read('nom_fitxer.wav')`).
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+import soundfile as sf
+import sounddevice as sd 
+from numpy.fft import fft 
+
+x_r, fm = sf.read('exercici1.wav')
+
+T = 2.5                           
+fx=523                              
+A=4 
+pi=np.pi 
+L = int(fm * T)                     
+Tm=1/fm                              
+t=Tm* np.arange(len(x_r)) 
+x = A * np.cos(2 * pi * fx * t)   
+sf.write('exercici2.wav', x, fm) 
+
+fx=fm/2
+Tx=1/fx                                   
+Ls=int(fm*5*Tx)                           
+
+plt.figure(2)                             
+plt.plot(t[0:Ls], x_r[0:Ls])               
 plt.xlabel('t en segons')                 
 plt.title('5 periodes de la sinusoide')   
+plt.show() 
+
+sd.play(x_r, fm) 
+
+N=5000                        
+X=fft(x_r[0 : Ls], N)  
+k=np.arange(N)
+
+plt.figure(21)
+plt.subplot(211) 
+plt.plot(k,abs(X))
+plt.title(f'Transformada del senyal de Ls={Ls} mostres amb DFT de N={N}')   
+plt.ylabel('|X[k]|') 
+plt.subplot(212) 
+plt.plot(k,np.unwrap(np.angle(X))) 
+plt.xlabel('Index k')               
+plt.ylabel('$\phi_x[k]$') 
 plt.show() 
 ```
 
@@ -171,8 +259,11 @@ import math as ma
 
 plt.figure(2)                        
 plt.subplot(211)  
-XdB = 20*ma.log(abs(X)/max(abs(X)))
-plt.plot(k,XdB)                   
+
+XdB = 20*np.log(abs(X)/max(X))
+fk = (k/N)*fm
+
+plt.plot(fk,XdB)                   
 plt.title('Transformada del senyal de Ls={Ls} mostres amb DFT de N={N}')   
 plt.ylabel('|X[k]|')                 
 plt.subplot(212)                      
@@ -181,6 +272,8 @@ plt.xlabel('Index k')
 plt.ylabel('$\phi_x[k]$')             
 plt.show()  
 ```
+
+
 - Comprova que la mesura de freqüència es correspon amb la freqüència de la sinusoide que has fet servir.
 
 - Com pots identificar l'amplitud de la sinusoide a partir de la representació de la transformada?
@@ -204,7 +297,44 @@ plt.show()
     - Tria un segment de senyal de 25ms i insereix una gráfica amb la seva evolució temporal.
     - Representa la seva transformada en dB en funció de la freqüència, en el marge $f_m\le f\le f_m/2$.
     - Quines son les freqüències més importants del segment triat?
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+import soundfile as sf
+import sounddevice as sd 
+from numpy.fft import fft 
 
+T= 0.025                               
+data, fm =sf.read('Gorilla.wav')       
+L = int(fm * T)                     
+Tm=1/fm                            
+t=Tm*np.arange(L)                  
+sf.write('exercici4.wav', data, fm)  
+
+plt.figure(4)                          
+plt.plot(t[0:L],data[0:L])              
+plt.xlabel('t en segons')               
+plt.title('Exercici 4')  
+plt.show()  
+
+N=5000                        
+X=fft(data[0 : L], N)    
+k=np.arange(N)                                         
+plt.figure(42)                         
+XdB = 20*np.log(np.abs(X)/max(np.abs(X)))
+fk = k[0:N//2+1]*fm/N
+plt.subplot(211)   
+plt.plot(fk,XdB[0:N//2+1])  # Representació del mòdul de la transformada en dB y de 0 a FK/2
+plt.title(f'Transformada del senyal de Ls={L} mostres amb DFT de N={N}')   
+plt.ylabel('Mòdul en dB')                   
+plt.subplot(212)                      
+plt.plot(fk,np.unwrap(np.angle(X[0:N//2+1])) )   
+plt.xlabel('f en Hz')                
+plt.ylabel('$\phi_x[k]$')          
+plt.show() 
+```
+<img src="img/Figure_4.png" width="400" align="center">
+<img src="img/Figure_42.png" width="400" align="center">
 
 Entrega
 -------
