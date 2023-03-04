@@ -151,43 +151,6 @@ plt.plot(k,np.unwrap(np.angle(X)))
 plt.xlabel('Index k')                  
 plt.ylabel('$\phi_x[k]$')   
 plt.show() 
-
-
-sf.write('exercici2.wav', x, fm)  
-
-plt.figure(121)                             
-plt.plot(t[0:Ls], x[0:Ls])                
-plt.xlabel('t en segons')                
-plt.title('5 periodes de la sinusoide')   
-plt.show()  
-
-sd.play(x, fm)
-
-plt.figure(12)
-plt.subplot(211)
-plt.plot(k, abs(X)) 
-plt.title('Transformada del senyal de Ls={Ls} mostres amb DFT de N={N}')   
-plt.ylabel('|X[k]|') 
-plt.subplot(212)
-plt.plot(k,np.unwrap(np.angle(X))) 
-plt.xlabel('Index k')                  
-plt.ylabel('$\phi_x[k]$') 
-plt.show()
-
-XdB = 20*np.log10(np.abs(X)/max(np.abs(X)))
-fk = (k/N)*fm
-
-plt.figure(2)                        
-plt.subplot(211)
- 
-plt.plot(fk,XdB)                   
-plt.title('Transformada del senyal de Ls={Ls} mostres amb DFT de N={N}')   
-plt.ylabel('|X[k]|')                 
-plt.subplot(212)                      
-plt.plot(k,np.unwrap(np.angle(XdB)))    
-plt.xlabel('Index k')                  
-plt.ylabel('$\phi_x[k]$')             
-plt.show()  
 ```
 
 Resposta: Al variar la freqüència a 4kHz, el so es torna més agut que en el cas anterior amb una freqüència a 440Hz.
@@ -255,26 +218,59 @@ Com que la senyal d'entrada és una sinusoide, si fem la transformada d'aquesta 
     $0$ a $f_m/2$ en Hz.
 
 ```python
-import math as ma
+import numpy as np
+import matplotlib.pyplot as plt
+import soundfile as sf
+import sounddevice as sd 
+from numpy.fft import fft 
 
-plt.figure(2)                        
-plt.subplot(211)  
+T= 2.5                              
+fm=8000                              
+fx=4000                               
+A=4                                  
+pi=np.pi                             
+L = int(fm * T)                     
+Tm=1/fm                              
+t=Tm*np.arange(L)                   
+x = A * np.cos(2 * pi * fx * t)      
+sf.write('exercici3.wav', x, fm)  
+x_r, fm = sf.read('exercici3.wav')
+Tx=1/fx                                   
+Ls=int(fm*5*Tx) 
 
-XdB = 20*np.log(abs(X)/max(X))
-fk = (k/N)*fm
+plt.figure(3)                             
+plt.plot(t[0:Ls], x[0:Ls])               
+plt.xlabel('t en segons')                 
+plt.title('Ex 3')  
+plt.show() 
 
+sd.play(x, fm)
+
+N=5000                        
+X=fft(x[0 : Ls], N)  
+k=np.arange(N)
+
+plt.figure(31)
+
+XdB =  20*np.log10(1.e-1 + np.abs(X)/(max(np.abs(X))))
+fk = (k/N)*(fm/2)
+                        
+plt.subplot(211)
+ 
 plt.plot(fk,XdB)                   
 plt.title('Transformada del senyal de Ls={Ls} mostres amb DFT de N={N}')   
 plt.ylabel('|X[k]|')                 
 plt.subplot(212)                      
-plt.plot(k,np.unwrap(np.angle(XdB)))    
-plt.xlabel('Index k')                  
-plt.ylabel('$\phi_x[k]$')             
+plt.plot(fk,np.unwrap(np.angle(XdB)))    
+plt.xlabel('fk (Hz)')                  
+plt.ylabel('$\phi_x[k]$')    
 plt.show()  
 ```
 
 
 - Comprova que la mesura de freqüència es correspon amb la freqüència de la sinusoide que has fet servir.
+
+<img src="img/Figure31.png" width="400" align="center">
 
 - Com pots identificar l'amplitud de la sinusoide a partir de la representació de la transformada?
       Comprova-ho amb el senyal generat.
@@ -305,23 +301,24 @@ import sounddevice as sd
 from numpy.fft import fft 
 
 T= 0.025                               
-data, fm =sf.read('Gorilla.wav')       
+x_r, fm =sf.read('Gorilla.wav')       
 L = int(fm * T)                     
 Tm=1/fm                            
 t=Tm*np.arange(L)                  
-sf.write('exercici4.wav', data, fm)  
+sf.write('exercici4.wav', x_r, fm)  
 
 plt.figure(4)                          
-plt.plot(t[0:L],data[0:L])              
+plt.plot(t[0:L],x_r[0:L])              
 plt.xlabel('t en segons')               
 plt.title('Exercici 4')  
 plt.show()  
+sd.play(x_r, fm)
 
 N=5000                        
-X=fft(data[0 : L], N)    
+X=fft(x_r[0 : L], N)    
 k=np.arange(N)                                         
 plt.figure(42)                         
-XdB = 20*np.log(np.abs(X)/max(np.abs(X)))
+XdB = 20*np.log10(1.e-1 + np.abs(X)/(max(np.abs(X))))
 fk = k[0:N//2+1]*fm/N
 plt.subplot(211)   
 plt.plot(fk,XdB[0:N//2+1])  # Representació del mòdul de la transformada en dB y de 0 a FK/2

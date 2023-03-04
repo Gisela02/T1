@@ -32,8 +32,8 @@ k=np.arange(N)
 
 plt.figure(31)
 
-XdB = 20*(np.log10(np.abs(X)/max(np.abs(X))))
-fk = (k/N)*fm
+XdB =  20*np.log10(1.e-1 + np.abs(X)/(max(np.abs(X))))
+fk = (k/N)*(fm/2)
                         
 plt.subplot(211)
  
